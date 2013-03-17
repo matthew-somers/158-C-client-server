@@ -1,0 +1,50 @@
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#define BUFLEN 16384
+#define PORT 9930
+
+int main(void)
+{
+   struct sockaddr_in si_me, si_other;
+   int s, i, slen=sizeof(si_other);
+   char buf[BUFLEN];
+
+   // socket()
+   s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+   //complicated stuff for receiving
+   memset((char *) &si_other, 0, sizeof(si_other));
+   si_other.sin_family = AF_INET;
+   si_other.sin_port = htons(PORT);
+
+   //complicated stuff for sending acks back
+   memset( (char *) &si_me, 0, sizeof(si_me) );
+   si_me.sin_family = AF_INET;
+   si_me.sin_port = htons(PORT);
+   si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+
+   //bind()
+   bind(s, &si_me, sizeof(si_me));
+
+
+   //main loop, waits, and the sends ack when it receives something
+   while (1) {
+
+      recvfrom(s, buf, BUFLEN, 0, &si_other, &slen);
+
+      printf("Received packet from %s:%d\nData: %s\n", 
+         inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port), buf);
+      
+      printf("Sending ack to %s\n\n", inet_ntoa(si_other.sin_addr));
+
+      sendto(s, buf, BUFLEN, 0, &si_other, slen);
+   }
+
+   close(s);
+   return 0;
+}
