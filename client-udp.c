@@ -1,6 +1,7 @@
 //changes for each person
+//#define SRV_IP "76.103.142.248"
 #define SRV_IP "98.248.54.14"
-     
+   
 #include <stdlib.h> /* exit */
 #include <string.h> /* memset */
 #include <unistd.h> /* close */
@@ -10,8 +11,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <time.h>
      
-#define NPACK 20
+#define NPACK 2
 #define PORT 9930
 
 //1Kbyte, 4KB, 8 KB, 16KB, 32 KB, and 64KB
@@ -21,7 +23,9 @@
 //#define BUFLEN 16384
 //#define BUFLEN 32768
 //#define BUFLEN 65536
-     
+    
+double get_time_ms();
+ 
 int main(void)
 {
    struct sockaddr_in si_other, si_me;
@@ -49,8 +53,16 @@ int main(void)
    //inet_aton() converts ip at top of page
    inet_aton(SRV_IP, &si_other.sin_addr);
      
-   struct timeval tv1, tv2, result, t1, t2, res2;
-   gettimeofday(&tv1,NULL);
+   struct timeval tv, tv1, tv2, result, t1, t2, res2;
+
+   //2 second timeout
+   tv.tv_sec = 2; 
+   setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
+
+   int lostpackets = 0;
+   
+   //start clock
+   double starttime = get_time_ms();
 
    //main loop, sends a packet, waits for an ack
    for (i=0; i<NPACK; i++)
@@ -58,22 +70,37 @@ int main(void)
       printf("Sending packet %d\n", i);
       sprintf(buf, "This is packet %d\n", i);
 
-      gettimeofday(&t1,NULL);
-
       sendto(s, buf, BUFLEN, 0, &si_other, slen);
-     
+      
       recvfrom(s, buf2, BUFLEN, 0, &si_other, &slen);
 
-      printf("Received ack from %s:%d\nData: %s\n", 
-        inet_ntoa(si_other.sin_addr),
-        ntohs(si_other.sin_port), buf2);
+      if (strcmp(buf, buf2) == 0) //buffers match, no packet lost
+      {
+         printf("Received ack from %s:%d\nData: %s\n", 
+           inet_ntoa(si_other.sin_addr),
+           ntohs(si_other.sin_port), buf2);
+      }
+      else
+      {
+         lostpackets++;
+         printf("Packet lost.\n\n");
+      }
    }
-     
-   gettimeofday(&tv2,NULL);
-   timersub(&tv2, &tv1, &result);
-   result.tv_usec = result.tv_usec / NPACK;
-   printf("Average RTT: %u microseconds, %u milliseconds\n", (int)result.tv_usec, (int)result.tv_usec/1000);
+    
+   //end clock
+   double endtime = get_time_ms();
+   double resulttime = (endtime - starttime) / NPACK;
+
+   printf("Average RTT: %f milliseconds\n", resulttime);
+   printf("Packets lost: %d\n", lostpackets);
 
    close(s);
+}
+
+double get_time_ms()
+{
+   struct timeval t;
+   gettimeofday(&t, NULL);
+   return (t.tv_sec + (t.tv_usec / 1000000.0)) * 1000.0;
 }
 
