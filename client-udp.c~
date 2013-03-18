@@ -13,11 +13,13 @@
 #include <sys/time.h>
 #include <time.h>
      
-#define NPACK 2
+#define NPACK 100 //number of packets to send
+#define TIMEOUT 2; //seconds to wait for ack before moving on
 #define PORT 9930
 
-//1Kbyte, 4KB, 8 KB, 16KB, 32 KB, and 64KB
-#define BUFLEN 1024
+//1 byte, 1KB, 4KB, 8 KB, 16KB, 32 KB, and 64KB
+//#define BUFLEN 1
+//#define BUFLEN 1024
 //#define BUFLEN 4096
 //#define BUFLEN 8192
 //#define BUFLEN 16384
@@ -53,10 +55,9 @@ int main(void)
    //inet_aton() converts ip at top of page
    inet_aton(SRV_IP, &si_other.sin_addr);
      
-   struct timeval tv, tv1, tv2, result, t1, t2, res2;
-
-   //2 second timeout
-   tv.tv_sec = 2; 
+   //timeout
+   struct timeval tv;
+   tv.tv_sec = TIMEOUT; 
    setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
 
    int lostpackets = 0;
