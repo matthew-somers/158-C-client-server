@@ -13,13 +13,13 @@
 #include <sys/time.h>
 #include <time.h>
      
-#define NPACK 100 //number of packets to send
+#define NPACK 10 //number of packets to send
 #define TIMEOUT 2; //seconds to wait for ack before moving on
 #define PORT 9930
 
 //1 byte, 1KB, 4KB, 8 KB, 16KB, 32 KB, and 64KB
 //#define BUFLEN 1
-//#define BUFLEN 1024
+#define BUFLEN 1024
 //#define BUFLEN 4096
 //#define BUFLEN 8192
 //#define BUFLEN 16384
