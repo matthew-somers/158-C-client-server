@@ -1,6 +1,6 @@
 //changes for each person
-//#define SRV_IP "76.103.142.248"
 #define SRV_IP "98.248.54.14"
+//#define SRV_IP "98.248.54.14"
    
 #include <stdlib.h> /* exit */
 #include <string.h> /* memset */
@@ -13,17 +13,17 @@
 #include <sys/time.h>
 #include <time.h>
      
-#define NPACK 10 //number of packets to send
-#define TIMEOUT 2; //seconds to wait for ack before moving on
+#define NPACK 100 //number of packets to send
+#define TIMEOUT 4; //seconds to wait for ack before moving on
 #define PORT 9930
 
 //1 byte, 1KB, 4KB, 8 KB, 16KB, 32 KB, and 64KB
 //#define BUFLEN 1
-#define BUFLEN 1024
+//#define BUFLEN 1024
 //#define BUFLEN 4096
 //#define BUFLEN 8192
 //#define BUFLEN 16384
-//#define BUFLEN 32768
+#define BUFLEN 32768
 //#define BUFLEN 65536
     
 double get_time_ms();
@@ -103,4 +103,5 @@ double get_time_ms()
    gettimeofday(&t, NULL);
    return (t.tv_sec + (t.tv_usec / 1000000.0)) * 1000.0;
 }
+
 
