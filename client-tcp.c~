@@ -62,14 +62,13 @@ int main(int argc, char *argv[])
 
    int NUMPACKETS = atoi(argv[3]);
    int i;
-   int lefttoreceive;
-   int received;
 
    //timing
    double starttime = get_time_ms();
-
-
+   int lefttoreceive;
+   int received;
    //sending loop
+
    for (i = 0; i < NUMPACKETS; i++)
    {
       sprintf(sendbuf, "This is packet %d\n", i);
@@ -87,6 +86,8 @@ int main(int argc, char *argv[])
 
       printf("%s\n", receivebuf);
    }
+
+
 
    //end clock
    double endtime = get_time_ms();

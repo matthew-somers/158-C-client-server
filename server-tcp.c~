@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
    //while(1)
    //{
-      listen(sockfd,2); //max queue 2
+      listen(sockfd,2); //max queue of 5 connections
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, 
          (struct sockaddr *) &cli_addr, &clilen);

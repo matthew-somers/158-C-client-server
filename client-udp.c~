@@ -1,5 +1,5 @@
 //changes for each person
-#define SRV_IP ""
+#define SRV_IP "98.248.54.14"
 //#define SRV_IP "98.248.54.14"
    
 #include <stdlib.h> /* exit */
