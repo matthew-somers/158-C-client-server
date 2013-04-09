@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
    int sockfd, newsockfd, portno;
    socklen_t clilen;
    struct sockaddr_in serv_addr, cli_addr;
-   int n;
+   int lefttoreceive;
    if (argc != 4) 
    {
       fprintf(stderr,"usage: %s port numpackets packetsize \n",
@@ -28,13 +28,14 @@ int main(int argc, char *argv[])
    }
    
    int BUFLEN = atoi(argv[3]);
-   char buffer[BUFLEN];
-   char buffer2[BUFLEN];
+   char tempbuf[BUFLEN];
+   char sendbuf[BUFLEN];
+   char receivebuf[BUFLEN];
 
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
    if (sockfd < 0)
    {
-      close(sockfd);
+      //close(sockfd);
       error("ERROR opening socket. Should be fixed now?");
    }
    bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -47,32 +48,43 @@ int main(int argc, char *argv[])
    if (bind(sockfd, (struct sockaddr *) &serv_addr,
       sizeof(serv_addr)) < 0) 
    {
-      error("ERROR on binding");
+      close(sockfd);
+      //error("ERROR on binding");
    }
 
 
-   while(1)
-   {
-      listen(sockfd,5); //max queue of 5 connections
+   //while(1)
+   //{
+      listen(sockfd,2); //max queue 2
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, 
          (struct sockaddr *) &cli_addr, &clilen);
       if (newsockfd < 0)
+      {
+         close(newsockfd);
          error("ERROR on accept");
+      }
 
       int i;
+      int received;
       int NUMPACKETS = atoi(argv[2]);
 
       for (i = 0; i < NUMPACKETS; i++)
       {
-         bzero(buffer,BUFLEN);
-         n = read(newsockfd,buffer,BUFLEN);
-         printf("Message %d: %s\n", i, buffer);
-         sprintf(buffer2, "I received: %s", buffer);
-         n = write(newsockfd, buffer2, BUFLEN);
-      }
+         bzero(receivebuf, BUFLEN);
+         lefttoreceive = BUFLEN;
 
-   }
+         while (lefttoreceive > 0)
+         {
+            received = recv(newsockfd,tempbuf,BUFLEN,0);
+            sprintf(receivebuf + strlen(receivebuf), tempbuf);
+            lefttoreceive -= received;
+         }
+         
+         printf("Message %d: %s\n", i, receivebuf);
+         sprintf(sendbuf, "I received: %s", receivebuf);
+         send(newsockfd, sendbuf, BUFLEN, 0);
+      }
 
    close(newsockfd);
    close(sockfd);

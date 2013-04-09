@@ -30,7 +30,9 @@ int main(int argc, char *argv[])
    }
 
    int BUFLEN = atoi(argv[4]);
-   char buffer[BUFLEN];
+   char sendbuf[BUFLEN];
+   char receivebuf[BUFLEN];
+   char tempbuf[BUFLEN];
    portno = atoi(argv[2]);
 
    //open socket
@@ -60,28 +62,30 @@ int main(int argc, char *argv[])
 
    int NUMPACKETS = atoi(argv[3]);
    int i;
+   int lefttoreceive;
+   int received;
 
    //timing
    double starttime = get_time_ms();
 
-   //sending loop
 
+   //sending loop
    for (i = 0; i < NUMPACKETS; i++)
    {
-      sprintf(buffer, "This is packet %d\n", i);
+      sprintf(sendbuf, "This is packet %d\n", i);
 
       //send through stream
-      n = write(sockfd, buffer, BUFLEN);
-      if (n < 0) 
-         error("ERROR writing to socket");
-      bzero(buffer, BUFLEN);
+      send(sockfd, sendbuf, BUFLEN, 0);
 
-      //read ack
-      n = read(sockfd, buffer, BUFLEN);
-      if (n < 0) 
-         error("ERROR reading from socket");
-      else
-         printf("%s\n", buffer);
+      lefttoreceive = BUFLEN;
+      while (lefttoreceive > 0)
+      {
+         received = recv(sockfd, tempbuf, BUFLEN,0);
+         lefttoreceive -= received;
+         sprintf(receivebuf + strlen(receivebuf), tempbuf);
+      }
+
+      printf("%s\n", receivebuf);
    }
 
    //end clock

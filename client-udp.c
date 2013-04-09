@@ -1,5 +1,5 @@
 //changes for each person
-#define SRV_IP "98.248.54.14"
+#define SRV_IP ""
 //#define SRV_IP "98.248.54.14"
    
 #include <stdlib.h> /* exit */
@@ -19,11 +19,11 @@
 
 //1 byte, 1KB, 4KB, 8 KB, 16KB, 32 KB, and 64KB
 //#define BUFLEN 1
-//#define BUFLEN 1024
+#define BUFLEN 1024
 //#define BUFLEN 4096
 //#define BUFLEN 8192
 //#define BUFLEN 16384
-#define BUFLEN 32768
+//#define BUFLEN 32768
 //#define BUFLEN 65536
     
 double get_time_ms();
