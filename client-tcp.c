@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
    //sending loop
    for (i = 0; i < NUMPACKETS; i++)
    {
+      bzero(receivebuf, BUFLEN);
       sprintf(sendbuf, "This is packet %d\n", i);
 
       //send through stream
